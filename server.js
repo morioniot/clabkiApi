@@ -27,52 +27,58 @@ var startExpress = function() {
 	console.log('Listening on port ' + config.express.port);
 };
 
-// var handleError = function(res){
-// 	console.log('¯\\_(ツ)_/¯');
-// 	return function(err){
-// 		console.log(err);
-// 		res.send(500, {error: err.message})
-// 	}
-// }
 
 var reportAsLost = function(request, res, next){
-	var newDoc = {reportedAsLost:true};
-	db.saveDoc("petStatus", newDoc)
-		.then(petStatus => {
-			console.log(petStatus)
-			res.json(petStatus);
-		});
+	const major  = request.query.major;
+	const minor  = request.query.minor;
+	const query  = {major: major, minor: minor};
+	const updatedDoc = {reported_as_lost: true}; 
+	db.status.update(query, updatedDoc)
+		.then(lostPet => {
+			console.log(lostPet)
+			if(lostPet.length > 0)
+				res.json(lostPet);
+			else
+				res.json({error:"Major and minor combination does not exist"})
+		})
+		.catch(err => {
+			console.log(err)
+			res.send(500, {error: err.detail})
+		})
 };
 
-var registerPet = function(request, res, next){
-	var newDoc = {reportedAsLost:false};
-	db.saveDoc("petStatus", newDoc)
-		.then(petStatus => {
-			console.log(petStatus)
-			res.json(petStatus);
-		});
+var register = function(request, res, next){
+	const major  = request.query.major;
+	const minor  = request.query.minor;
+	const newDoc = {major: major, minor: minor, reported_as_lost: false}; 
+	db.status.save(newDoc)
+		.then(register => {
+			console.log(register)
+			res.json(register);
+		})
+		.catch(err => {
+			console.log(err)
+			res.send(500, {error: err.detail})
+		})
 };
 
-var getPetStatus = function(request, res, next){
-
-	const petId = request.query.id;
-	console.log('Getting pet status : ' + petId );
-	if(petId != undefined){
-		const query = {id: petId};
-		db.petstatus.findDoc(query)	
-			.then(petStatus => {
-				console.log('Then getPetSatus')
-				console.log(petStatus)
-				res.json(petStatus);
-			});	
-	}
-	else{
-		res.json({error:"Undefined ID"})
-	}
+var getStatus = function(request, res, next){
+	const major = request.query.major;
+	const minor = request.query.minor;
+	console.log("Major: " + major + " Minor: " + minor);
+	const query = {major: major, minor: minor};
+	db.status.findOne(query)
+		.then( status => {
+			console.log(status);
+			if(status != undefined)
+				res.json(status);
+			else
+				res.json({error:"Major and minor combination does not exist"})
+		})
 };
 
 var cleanDataBase = function(request, res, next){
-	db.petstatus.destroy({})	
+	db.status.destroy({})	
 		.then(destroyedElements => {
 			console.log(destroyedElements)
 			res.json(destroyedElements);
@@ -91,8 +97,8 @@ massive(connectionInfo)
 
 		/// Define API routes
 		app.route('/api/reportPetAsLost').get(reportAsLost);
-		app.route('/api/registerPet').get(registerPet);
-		app.route('/api/getPetStatus').get(getPetStatus);
+		app.route('/api/register').get(register);
+		app.route('/api/getStatus').get(getStatus);
 		app.route('/api/cleanDataBase').get(cleanDataBase);
 
 	    startExpress();
