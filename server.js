@@ -1,6 +1,5 @@
 
-//Configuration values
-const config     = require('./config.json');
+
 //Web Server
 const express    = require('express');
 //Middleware
