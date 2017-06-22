@@ -1,4 +1,3 @@
 node_modules/
-config.json
 openshift.txt
-postgreSQL_commands.txt
+mysql_commands.txt
