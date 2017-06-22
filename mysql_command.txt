@@ -1,0 +1,26 @@
+
+0. Start mysql
+
+ > mysql
+
+1. Use Database
+
+ > USE clabkiapi;
+
+2. Create Table
+
+ > CREATE TABLE status(id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,major INT(16), minor INT(16), reported_as_lost BOOL);
+
+
+3. Create index
+
+ > CREATE UNIQUE INDEX major_minor_combination ON status (major,minor);
+
+
+4. Check Table
+
+ > DESCRIBE status;
+
+5. INSERT
+
+  > INSERT INTO 'status' ('id','major','minor','reported_as_lost') VALUES (0,1,1,false);
