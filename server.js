@@ -30,7 +30,7 @@ const app = express();
 
 var startExpress = function() {
 	app.set("port", (process.env.OPENSHIFT_NODEJS_PORT || 5000));
-	app.set("ip", (process.env.OPENSHIFT_NODE_IP || "localhost"))	
+	app.set("ip", (process.env.OPENSHIFT_NODEJS_IP || "localhost"))	
 	app.listen(app.get("port"), app.get("ip"), function(){
 		console.log("Server started: " + app.get("ip") + ":" + app.get("port") + "/");
 	});
