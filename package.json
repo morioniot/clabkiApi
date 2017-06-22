@@ -12,6 +12,6 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
-    "massive": "^3.0.0-rc1"
+    "mysql": "^2.13.0"
   }
 }
