@@ -93,6 +93,7 @@ var cleanDataBase = function(request, res, next){
     	connection.query('ALTER TABLE status AUTO_INCREMENT = 1',function(err){
     		if(err)
     			throw err;
+    		res.json({message:"DataBase has been restored"});
 
     	})	
 	});
