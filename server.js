@@ -78,7 +78,7 @@ var getStatus = function(request, res, next){
 			res.status(500).send({error: err});
 		if(rows.length > 0){
 			console.log(rows);
-			res.json(rows);	
+			res.json(rows[0]);	
 		}
 		else{
 			res.json({error:"Major and minor combination does not exist"})
