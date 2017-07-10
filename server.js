@@ -71,14 +71,15 @@ var reportAsLost = function(request, res, next){
 var register = function(request, res, next){
 	const major  = request.query.major;
 	const minor  = request.query.minor;
-	const newDoc = {major: major, minor: minor, reported_as_lost: false}; 
+	const user   = request.query.user;
+	console.log("Registering Pet : Major: " + major + " Minor: " + minor + " User: " + user);
+	const newDoc = {major: major, minor: minor, reported_as_lost: false, user: user}; 
 	dataBaseConnectionObject.query('INSERT INTO status SET ?', newDoc, function(err,result){
 	  if(err){
 		res.status(500).send({error: err});
 	  }
 	  else{
-		  const savedRegister = {id: result.insertId, major: major, minor: minor, reported_as_lost: false};
-		  console.log(savedRegister);
+		  const savedRegister = {id: result.insertId, major: major, minor: minor, reported_as_lost: false, user: user};
 		  res.json(savedRegister);	
 	  }
 	});
@@ -87,13 +88,12 @@ var register = function(request, res, next){
 var getStatus = function(request, res, next){
 	const major = request.query.major;
 	const minor = request.query.minor;
-	console.log("Major: " + major + " Minor: " + minor);
+	console.log("Getting  Pet Status : Major: " + major + " Minor: " + minor);
 	const query = {major: major, minor: minor};
 	dataBaseConnectionObject.query('SELECT * FROM status WHERE  major ='+ query.major +' AND minor = ' + query.minor + '',function(err,rows){
 		if(err)
 			res.status(500).send({error: err});
 		if(rows.length > 0){
-			console.log(rows);
 			res.json(rows[0]);	
 		}
 		else{
@@ -104,15 +104,19 @@ var getStatus = function(request, res, next){
 
 var cleanDataBase = function(request, res, next){
 
-	dataBaseConnectionObject.query('DELETE  FROM status', function(err, result){
-    	if (err) throw err;
-    	console.log('Deleted ' + result.affectedRows + ' rows');	
-    	dataBaseConnectionObject.query('ALTER TABLE status AUTO_INCREMENT = 1',function(err){
-    		if(err)
-    			throw err;
-    		res.json({success:"DataBase has been restored"});
-
-    	})	
+	const userRequest = request.query.user;
+	console.log("Cleaning DataBase for user: " + userRequest);
+	dataBaseConnectionObject.query('DELETE FROM status WHERE user = ?', [userRequest], function(err, result){
+    	if (err) throw err;	
+		if(err)
+			res.status(500).send({error: err});
+    	if(result.affectedRows > 0){
+    		const message = 'Deleted ' + result.affectedRows + ' rows for the user: ' + userRequest;
+    		res.json({success: message});
+    	}
+    		
+    	else
+    		res.json({error:"User does not have any pet associated"})    	
 	});
 };
 
@@ -120,8 +124,7 @@ var removePet = function(request, res, next){
 
 	const major = request.query.major;
 	const minor = request.query.minor;
-	console.log("Deleting Pet by Major and Minor")
-	console.log("Major: " + major + " Minor: " + minor);
+	console.log("Deleting Pet by Major and Minor: " + "Major: " + major + " Minor: " + minor)
 	const query = {major: major, minor: minor};
 	dataBaseConnectionObject.query('DELETE FROM status WHERE  major ='+ query.major +' AND minor = ' + query.minor + '', function(err, result){
     	if (err)
@@ -137,7 +140,7 @@ var removePet = function(request, res, next){
 var togglePetStatus = function(request, res, next){
 	const major = request.query.major;
 	const minor = request.query.minor;
-	console.log("Major: " + major + " Minor: " + minor);
+	console.log("Toggling status for Pet : Major: " + major + " Minor: " + minor);
 	const query = {major: major, minor: minor};
 	dataBaseConnectionObject.query('UPDATE status SET reported_as_lost = !reported_as_lost WHERE  major ='+ query.major +' AND minor = ' + query.minor + '',function(err,result){
 
