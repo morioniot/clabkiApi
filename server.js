@@ -124,7 +124,8 @@ var removePet = function(request, res, next){
 	console.log("Major: " + major + " Minor: " + minor);
 	const query = {major: major, minor: minor};
 	dataBaseConnectionObject.query('DELETE FROM status WHERE  major ='+ query.major +' AND minor = ' + query.minor + '', function(err, result){
-    	if (err) throw err;	
+    	if (err)
+    		res.status(500).send({error: err});	
     	if(result.affectedRows > 0)
     		res.json({success:"A pet has been deleted from DataBase"})
     	else
@@ -133,6 +134,21 @@ var removePet = function(request, res, next){
 	});
 };
 
+var togglePetStatus = function(request, res, next){
+	const major = request.query.major;
+	const minor = request.query.minor;
+	console.log("Major: " + major + " Minor: " + minor);
+	const query = {major: major, minor: minor};
+	dataBaseConnectionObject.query('UPDATE status SET reported_as_lost = !reported_as_lost WHERE  major ='+ query.major +' AND minor = ' + query.minor + '',function(err,result){
+
+		if(err)
+			res.status(500).send({error: err});
+    	if(result.affectedRows > 0)
+    		getStatus(request, res, next);
+    	else
+    		res.json({error:"Major and minor combination does not exist in Database"})
+	});
+};
 
 /// Data Parsing
 app.use(bodyParser.json());
@@ -144,6 +160,7 @@ app.route('/api/register').get(register);
 app.route('/api/getStatus').get(getStatus);
 app.route('/api/cleanDataBase').get(cleanDataBase);
 app.route('/api/removePet').get(removePet);
+app.route('/api/togglePetStatus').get(togglePetStatus);
 
 startExpress();
 handleDataBaseDisconnect();
