@@ -1,6 +1,9 @@
 
 0. Start mysql
 
+ Local
+ > mysql -u root -p
+ Openshift
  > mysql
 
 1. Use Database
@@ -9,7 +12,7 @@
 
 2. Create Table
 
- > CREATE TABLE status(id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,major INT(16), minor INT(16), reported_as_lost BOOL);
+ > CREATE TABLE status(id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,major INT(16), minor INT(16), reported_as_lost BOOL, user CHAR(20));
 
 
 3. Create index
@@ -23,4 +26,4 @@
 
 5. INSERT
 
-  > INSERT INTO 'status' ('id','major','minor','reported_as_lost') VALUES (0,1,1,false);
+  > INSERT INTO 'status' ('id','major','minor','reported_as_lost','user') VALUES (0,1,1,false,"nico");

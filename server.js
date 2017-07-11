@@ -73,16 +73,22 @@ var register = function(request, res, next){
 	const minor  = request.query.minor;
 	const user   = request.query.user;
 	console.log("Registering Pet : Major: " + major + " Minor: " + minor + " User: " + user);
-	const newDoc = {major: major, minor: minor, reported_as_lost: false, user: user}; 
-	dataBaseConnectionObject.query('INSERT INTO status SET ?', newDoc, function(err,result){
-	  if(err){
-		res.status(500).send({error: err});
-	  }
-	  else{
-		  const savedRegister = {id: result.insertId, major: major, minor: minor, reported_as_lost: false, user: user};
-		  res.json(savedRegister);	
-	  }
-	});
+	if(user != undefined){
+		const newDoc = {major: major, minor: minor, reported_as_lost: false, user: user}; 
+		dataBaseConnectionObject.query('INSERT INTO status SET ?', newDoc, function(err,result){
+		  if(err){
+			res.status(500).send({error: err});
+		  }
+		  else{
+			  const savedRegister = {id: result.insertId, major: major, minor: minor, reported_as_lost: false, user: user};
+			  res.json(savedRegister);	
+		  }
+		});	
+	}
+	else{
+		const message = "An user must be provided"
+		res.json({error:message});
+	}
 };
 
 var getStatus = function(request, res, next){
@@ -104,20 +110,26 @@ var getStatus = function(request, res, next){
 
 var cleanDataBase = function(request, res, next){
 
-	const userRequest = request.query.user;
-	console.log("Cleaning DataBase for user: " + userRequest);
-	dataBaseConnectionObject.query('DELETE FROM status WHERE user = ?', [userRequest], function(err, result){
-    	if (err) throw err;	
-		if(err)
-			res.status(500).send({error: err});
-    	if(result.affectedRows > 0){
-    		const message = 'Deleted ' + result.affectedRows + ' rows for the user: ' + userRequest;
-    		res.json({success: message});
-    	}
-    		
-    	else
-    		res.json({error:"User does not have any pet associated"})    	
-	});
+	const user = request.query.user;
+	console.log("Cleaning DataBase for user: " + user);
+	if(user != undefined){		
+		dataBaseConnectionObject.query('DELETE FROM status WHERE user = ?', [user], function(err, result){
+	    	if (err) throw err;	
+			if(err)
+				res.status(500).send({error: err});
+	    	if(result.affectedRows > 0){
+	    		const message = 'Deleted ' + result.affectedRows + ' rows for the user: ' + user;
+	    		res.json({success: message});
+	    	}
+	    		
+	    	else
+	    		res.json({error:"User does not have any pet associated"})    	
+		});
+	}
+	else{
+		const message = "An user must be provided"
+		res.json({error:message});
+	}
 };
 
 var removePet = function(request, res, next){
