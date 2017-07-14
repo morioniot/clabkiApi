@@ -171,7 +171,7 @@ var addLocationToPet = function(request, res, next){
 	const latitude  = request.query.lat;
 	const longitude = request.query.lon;
 	console.log("Adding Location to Pet with: Major: " + major + " Minor: " + minor);
-	const mysqlPointString = "ST_GeomFromText('POINT(" + latitude + " " +  longitude + ")')";
+	const mysqlPointString = "GeomFromText('POINT(" + latitude + " " +  longitude + ")')";
 	const sql = "UPDATE status SET coordinates=" + mysqlPointString + " WHERE major= " + major + " AND minor= " + minor
 	dataBaseConnectionObject.query(sql,function(err,result){
 
