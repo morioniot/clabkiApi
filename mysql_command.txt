@@ -12,7 +12,7 @@
 
 2. Create Table
 
- > CREATE TABLE status(id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,major INT(16), minor INT(16), reported_as_lost BOOL, user CHAR(20));
+ > CREATE TABLE status(id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,major INT(16), minor INT(16), reported_as_lost BOOL, user CHAR(20), coordinates POINT);
 
 
 3. Create index
@@ -26,4 +26,9 @@
 
 5. INSERT
 
-  > INSERT INTO 'status' ('id','major','minor','reported_as_lost','user') VALUES (0,1,1,false,"nico");
+ > INSERT INTO status (id,major,minor,reported_as_lost,user,coordinates) VALUES (0,1,1,false,'nico',ST_GeomFromText('POINT(1 1)'));
+
+
+6. SELECT GEO POINTS
+
+ SELECT X(coordinates), Y(coordinates) FROM status; 

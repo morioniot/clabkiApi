@@ -165,6 +165,25 @@ var togglePetStatus = function(request, res, next){
 	});
 };
 
+var addLocationToPet = function(request, res, next){
+	const major     = request.query.major;
+	const minor     = request.query.minor;
+	const latitude  = request.query.lat;
+	const longitude = request.query.lon;
+	console.log("Adding Location to Pet with: Major: " + major + " Minor: " + minor);
+	const mysqlPointString = "ST_GeomFromText('POINT(" + latitude + " " +  longitude + ")')";
+	const sql = "UPDATE status SET coordinates=" + mysqlPointString + " WHERE major= " + major + " AND minor= " + minor
+	dataBaseConnectionObject.query(sql,function(err,result){
+
+		if(err)
+			res.status(500).send({error: err});
+    	if(result.affectedRows > 0)
+    		getStatus(request, res, next);
+    	else
+    		res.json({error:"Major and minor combination does not exist in Database"})
+	});
+};
+
 /// Data Parsing
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extender:true}));
@@ -176,6 +195,8 @@ app.route('/api/getStatus').get(getStatus);
 app.route('/api/cleanDataBase').get(cleanDataBase);
 app.route('/api/removePet').get(removePet);
 app.route('/api/togglePetStatus').get(togglePetStatus);
+app.route('/api/addLocationToPet').get(addLocationToPet);
+
 
 startExpress();
 handleDataBaseDisconnect();
